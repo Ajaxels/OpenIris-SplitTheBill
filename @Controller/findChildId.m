@@ -16,7 +16,7 @@ function id = findChildId(obj, childName)
 
 %|
 % @b Examples:
-% @code id = obj.findChildId('mibImageAdjController');     // find an index of mibImageAdjController @endcode
+% @code id = obj.findChildId('newController');     // find an index of mibImageAdjController @endcode
 
 % Copyright (C) 2019-2020 Ilya Belevich, University of Helsinki (ilya.belevich @ helsinki.fi)
 % The MIT License (https://opensource.org/licenses/MIT)

@@ -9,7 +9,7 @@ function startController(obj, controllerName, varargin)
 
 %| 
 % @b Examples:
-% @code obj.startController('mibImageAdjController');     // start a child controller from a callback for handles.mibDisplayBtn press  @endcode
+% @code obj.startController('newController');     // start a child controller from a callback for handles.mibDisplayBtn press  @endcode
 % @code
 % Options.opt1 = 1; % [optional] dataset orientation
 % Options.opt2 = 1; % [optional] dataset orientation
