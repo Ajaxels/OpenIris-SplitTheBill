@@ -24,6 +24,6 @@ if ~isdeployed
     addpath(fullfile(func_dir, 'Tools'));
     % addpath(fullfile(func_dir, 'Classes'));
 end
-
+version = 'ver. 2020.01 (17.12.2020)';
 model = Model();     % initialize the model
-controller = Controller(model);  % initialize controller
+controller = Controller(model, version);  % initialize controller

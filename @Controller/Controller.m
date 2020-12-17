@@ -57,6 +57,8 @@ classdef Controller < handle
             obj.Model = Model;    % assign model
             obj.View = View(obj);
             
+            obj.View.gui.Name = [obj.View.gui.Name, '  ' parameter];
+            
             % obtain settings from a file
             % saving settings
             temp = tempdir;

@@ -253,7 +253,8 @@ classdef Model < handle
                         s{shiftY,3} = cell2mat(table2cell(Tuser(1, UserNameIndex)));
                         s{shiftY,4} = sprintf('%s', resTime);
                         Tuser2 = Tuser(:, ChargeIndex);    Tuser2.Charge = str2double(Tuser2.Charge);
-                        s{shiftY,5} = sprintf('%0.2f', sum(Tuser2.Charge));
+                        %s{shiftY,5} = sprintf('%0.2f', sum(Tuser2.Charge));
+                        s{shiftY,5} = sum(Tuser2.Charge);
                         s{shiftY,6} = cell2mat(table2cell(Tuser(1, PriceTypeIndex)));
                     end
                     shiftY = shiftY + 2;
@@ -282,7 +283,8 @@ classdef Model < handle
                         s{shiftY,4} = sum(str2double(quantityVec.Quantity));
                         
                         chargeVec = CurrProduct(:, ChargeIndex);    chargeVec.Charge = str2double(chargeVec.Charge);
-                        s{shiftY,5} = sprintf('%0.2f', sum(chargeVec.Charge));
+                        %s{shiftY,5} = sprintf('%0.2f', sum(chargeVec.Charge));
+                        s{shiftY,5} = sum(chargeVec.Charge);
                         s{shiftY,6} = cell2mat(table2cell(CurrProduct(1, PriceTypeIndex)));
                     end
                     shiftY = shiftY + 2;
@@ -299,7 +301,9 @@ classdef Model < handle
                 s{shiftY,4} = cell2mat(table2cell(T2(1, RemitCodeIndex))); 
                 s{shiftY,5} = cell2mat(table2cell(T2(1, CostCenterCodeIndex)));
                 T3 = T2(:, ChargeIndex);    T3.Charge = str2double(T3.Charge);
-                s{shiftY,6} = sprintf('%0.2f', sum(T3.Charge)); %s{shiftY,8} = PriceTypeVar;
+                %s{shiftY,6} = sprintf('%0.2f', sum(T3.Charge)); %s{shiftY,8} = PriceTypeVar;
+                s{shiftY,6} = sum(T3.Charge); %s{shiftY,8} = PriceTypeVar;
+                
                 
                 % add summary to the summary sheet
                 if obj.Settings.gui.GenerateSummaryFile
