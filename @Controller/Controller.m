@@ -194,6 +194,8 @@ classdef Controller < handle
             obj.Model.Settings.gui.DetectDuplicates = obj.View.DetectDuplicates.Value;
             obj.Model.Settings.gui.DetectCollaborations = obj.View.DetectCollaborations.Value;
             obj.Model.Settings.gui.CollaborationMarker = obj.View.CollaborationMarker.Value;
+            obj.Model.Settings.gui.DetectExternalProjects = obj.View.DetectExternalProjects.Value;
+            obj.Model.Settings.gui.ExternalProjectMarker = obj.View.ExternalProjectMarker.Value;
         end
         
         function StartProcessing(obj)

@@ -127,9 +127,18 @@ classdef Model < handle
                 SummaryCounter = 2;     % row index in the summary file, 1st one reserved for the titles
             end
             
+            % create folders for detected collaborations and external projects
             if obj.Settings.gui.DetectCollaborations
                 collaborationsDir = fullfile(obj.Settings.gui.OutputDirectory, 'Collaborations');
                 if ~isfolder(collaborationsDir); mkdir(collaborationsDir); end
+            end
+            if obj.Settings.gui.DetectExternalProjects
+                externalDir = fullfile(obj.Settings.gui.OutputDirectory, 'External');
+                if ~isfolder(externalDir); mkdir(externalDir); end
+            end
+            if obj.Settings.gui.DetectExternalProjects && obj.Settings.gui.DetectCollaborations
+                externalCollabDir = fullfile(obj.Settings.gui.OutputDirectory, 'ExternalCollaborations');
+                if ~isfolder(externalCollabDir); mkdir(externalCollabDir); end
             end
             
             % look for duplicate indices
@@ -151,12 +160,31 @@ classdef Model < handle
                 T2 = obj.T(indices, :);
                 T2.Properties.VariableNames = obj.VariableNames;
                 T2 = sortrows(T2, sortingIndex);
-                fnTemplate = sprintf('%s_%s_%s.xlsx', cell2mat(table2array(T2(1, GroupPIIndex))), cell2mat(table2array(T2(1, splitIndex))), dateString); %#ok<FNDSB>
+                % detect the group name
+                groupNames = unique(table2array(T2(:, GroupPIIndex)));
+                if numel(groupNames) > 1
+                    if ~isempty(groupNames{1})
+                        groupName = groupNames{1};
+                    else
+                        groupName = groupNames{2};
+                    end
+                else
+                    groupName = groupNames{1};
+                end
                 
+                fnTemplate = sprintf('%s_%s_%s.xlsx', groupName, cell2mat(table2array(T2(1, splitIndex))), dateString); %#ok<FNDSB>
                 fn = fullfile(obj.Settings.gui.OutputDirectory, fnTemplate); % default output filename
-                if obj.Settings.gui.DetectCollaborations    % detect collaboration project to put them into a separate folder
-                    if ~isempty(strfind(T2.RequestTitle{1}, obj.Settings.gui.CollaborationMarker))  % find the text marker
-                        fn = fullfile(collaborationsDir, fnTemplate); % update output filename for collaboration projects
+                
+                if obj.Settings.gui.DetectCollaborations || obj.Settings.gui.DetectExternalProjects
+                    if obj.Settings.gui.DetectCollaborations && obj.Settings.gui.DetectExternalProjects     % external+collaborations
+                        if ~isempty(strfind(T2.RequestTitle{1}, obj.Settings.gui.CollaborationMarker)) && ...
+                            ~isempty(strfind(T2.RequestTitle{1}, obj.Settings.gui.ExternalProjectMarker))   
+                            fn = fullfile(externalCollabDir, fnTemplate); 
+                        elseif ~isempty(strfind(T2.RequestTitle{1}, obj.Settings.gui.CollaborationMarker))   % collaborations projects
+                            fn = fullfile(collaborationsDir, fnTemplate); 
+                        elseif ~isempty(strfind(T2.RequestTitle{1}, obj.Settings.gui.ExternalProjectMarker))   % external projects
+                            fn = fullfile(externalDir, fnTemplate); 
+                        end
                     end
                 end
                 if exist(fn, 'file') == 2; delete(fn); end
@@ -190,7 +218,7 @@ classdef Model < handle
                 s{3,5} = cell2mat(table2cell(T2(1, BillingAddressIndex)));
                 
                 s{8,1} = 'Project title:'; s{8,3} = [cell2mat(table2cell(T2(1, RequestIDIndex))) ', ' cell2mat(table2cell(T2(1, ProjectNameIndex)))]; %#ok<*FNDSB>
-                s{10,1} = 'Group leader:'; s{10,3} = cell2mat(table2cell(T2(1, GroupPIIndex))); 
+                s{10,1} = 'Group leader:'; s{10,3} = groupName; 
                 %s{10,1} = 'Affiliated department:'; s{10,3} = ''; 
                 s{11,1} = 'Organization:'; s{11,3} = cell2mat(table2cell(T2(1, OrganizationIndex)));
                 
@@ -296,7 +324,7 @@ classdef Model < handle
                 resId = resId + 1;
                 lineVec(resId) = shiftY;    % index of the line where to add underline
                 shiftY = shiftY + 1;
-                s{shiftY,3} = cell2mat(table2cell(T2(1, GroupPIIndex))); 
+                s{shiftY,3} = groupName; 
                 %s{shiftY,4} = ''; 
                 s{shiftY,4} = cell2mat(table2cell(T2(1, RemitCodeIndex))); 
                 s{shiftY,5} = cell2mat(table2cell(T2(1, CostCenterCodeIndex)));
@@ -386,10 +414,13 @@ classdef Model < handle
                 objExcel.ActiveSheet.Range(rangeText).HorizontalAlignment = 3;  % 2-left, 3-center, 4 - right
                 
                 objExcel.PrintCommunication = 1;
-                objExcel.ActiveSheet.PageSetup.Zoom = false;
-                objExcel.ActiveSheet.PageSetup.FitToPagesWide = 1;
+                try     % when no printers installed the code below gives an error
+                    objExcel.ActiveSheet.PageSetup.Zoom = false;
+                    objExcel.ActiveSheet.PageSetup.FitToPagesWide = 1;
                 %objExcel.ActiveSheet.PageSetup.PrintArea = sprintf('A1:F%d', size(s, 1));  % "$A$1:$C$5";
-                
+                catch err
+                    
+                end
                 % Save, close and clean up.
                 objExcel.ActiveWorkbook.Save;
                 objExcel.ActiveWorkbook.Close;
