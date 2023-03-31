@@ -82,6 +82,8 @@ classdef Model < handle
             splitIndex = find(ismember(obj.VariableNames, obj.Settings.gui.SplitBillsField));
             sortingIndex = find(ismember(obj.VariableNames, obj.Settings.gui.SortBillsField));
             
+            RequesterNameIndex = [];  % index of the field containing the requester's name
+            RequesterEMailIndex = [];  % index of the field containing the requester's email
             CreationDateIndex = find(ismember(obj.VariableNames, 'CreationDate'));
             GroupPIIndex = find(ismember(obj.VariableNames, 'Group'));
             ProjectNameIndex = find(ismember(obj.VariableNames, 'RequestTitle'));
@@ -115,16 +117,26 @@ classdef Model < handle
             end
             
             if obj.Settings.gui.GenerateSummaryFile
-                Summary = cell([numel(splitEntries)+1, 6]);     % allocate space
-                Summary{1,1} = 'Group name'; 
-                %Summary{1,2} = 'Affiliated department'; 
-                Summary{1,2} = 'Organization'; 
-                Summary{1,3} = 'Remit code'; 
-                Summary{1,4} = 'Cost center code'; 
-                Summary{1,5} = 'Total charge'; 
-                Summary{1,6} = 'Price type'; 
-                Summary{1,7} = 'Request title'; 
+                Summary = cell([numel(splitEntries)+1, 7]);     % allocate space
+                Summary{1,1} = 'Remit code'; 
+                Summary{1,2} = 'Group name'; 
+                Summary{1,3} = 'Cost center code (WBS)'; 
+                Summary{1,4} = 'Total charge'; 
+                Summary{1,5} = 'Verifier name'; % requester
+                Summary{1,6} = 'Organization';
+                Summary{1,7} = 'Price type'; 
+                Summary{1,8} = 'Request title'; 
                 SummaryCounter = 2;     % row index in the summary file, 1st one reserved for the titles
+
+%                 Summary{1,1} = 'Group name'; 
+%                 %Summary{1,2} = 'Affiliated department'; 
+%                 Summary{1,2} = 'Organization';
+%                 Summary{1,3} = 'Remit code'; 
+%                 Summary{1,4} = 'Cost center code'; 
+%                 Summary{1,5} = 'Total charge'; 
+%                 Summary{1,6} = 'Price type'; 
+%                 Summary{1,7} = 'Request title'; 
+               
             end
             
             % create folders for detected collaborations and external projects
@@ -198,7 +210,7 @@ classdef Model < handle
                 [~, invoiceName] = fileparts(fnTemplate);
                 
                 % get indices of the products
-                productIndices = ismember(table2array(T2(:, ChargeTypeIndex)), 'Product (request)');
+                productIndices = ismember(table2array(T2(:, ChargeTypeIndex)), {'Product (request)', 'Product (booking)'});
                 % generate table with products
                 productsTable = T2(productIndices, :);
                 reservationsTable = T2(~productIndices, :);
@@ -335,13 +347,22 @@ classdef Model < handle
                 
                 % add summary to the summary sheet
                 if obj.Settings.gui.GenerateSummaryFile
-                    Summary{SummaryCounter,1} = s{shiftY,3}; 
-                    Summary{SummaryCounter,2} = cell2mat(table2cell(T2(1, OrganizationIndex))); %s{shiftY,4}; 
-                    Summary{SummaryCounter,3} = s{shiftY,4}; 
-                    Summary{SummaryCounter,4} = s{shiftY,5}; 
-                    Summary{SummaryCounter,5} = s{shiftY,6}; 
-                    Summary{SummaryCounter,6} = PriceTypeVar; 
-                    Summary{SummaryCounter,7} = s{8, 3};
+                    Summary{SummaryCounter, 1} = s{shiftY, 4}; 
+                    Summary{SummaryCounter, 2} = s{shiftY, 3}; 
+                    Summary{SummaryCounter, 3} = s{shiftY, 5}; 
+                    Summary{SummaryCounter, 4} = s{shiftY, 6}; 
+                    Summary{SummaryCounter, 5} = '';  %  RequesterNameIndex / RequesterEMailIndex
+                    Summary{SummaryCounter, 6} = cell2mat(table2cell(T2(1, OrganizationIndex))); %s{shiftY,4}; 
+                    Summary{SummaryCounter, 7} = PriceTypeVar; 
+                    Summary{SummaryCounter, 8} = s{8, 3};
+
+%                     Summary{SummaryCounter, 1} = s{shiftY, 3}; 
+%                     Summary{SummaryCounter, 2} = cell2mat(table2cell(T2(1, OrganizationIndex))); %s{shiftY,4}; 
+%                     Summary{SummaryCounter, 3} = s{shiftY, 4}; 
+%                     Summary{SummaryCounter, 4} = s{shiftY, 5}; 
+%                     Summary{SummaryCounter, 5} = s{shiftY, 6}; 
+%                     Summary{SummaryCounter, 6} = PriceTypeVar; 
+%                     Summary{SummaryCounter, 7} = s{8, 3};
                     SummaryCounter = SummaryCounter + 1;
                 end
                 

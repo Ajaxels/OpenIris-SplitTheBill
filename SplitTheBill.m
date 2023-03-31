@@ -13,6 +13,9 @@ function SplitTheBill()
 % Copyright (C) 2019-2020 Ilya Belevich, University of Helsinki (ilya.belevich @ helsinki.fi)
 % The MIT License (https://opensource.org/licenses/MIT)
 
+% Updates:
+% 2022.1: fixed extraction of products that were added to the booking slots
+
 % turn off warnings
 warning('off', 'MATLAB:ui:javaframe:PropertyToBeRemoved'); 
 
@@ -24,6 +27,7 @@ if ~isdeployed
     addpath(fullfile(func_dir, 'Tools'));
     % addpath(fullfile(func_dir, 'Classes'));
 end
-version = 'ver. 2020.01 (17.12.2020)';
+version = 'ver. 2023.01 (31.03.2023)';
+if isdeployed; version = [version ' Academic version']; end
 model = Model();     % initialize the model
 controller = Controller(model, version);  % initialize controller

@@ -100,9 +100,33 @@ classdef Controller < handle
             if exist(value, 'file') == 2
                 obj.Model.Settings.gui.InputFilename = value;
                 obj.Model.getColumnNames();
-                obj.View.TableIndexField.Items = sort(obj.Model.VariableNames);
-                obj.View.SplitBillsField.Items = sort(obj.Model.VariableNames);
-                obj.View.SortBillsField.Items = sort(obj.Model.VariableNames);
+                if ismember(obj.View.TableIndexField.Value, obj.Model.VariableNames)
+                    obj.View.TableIndexField.Items = sort(obj.Model.VariableNames);
+                else
+                    obj.View.TableIndexField.Items = sort(obj.Model.VariableNames);
+                    if ismember('ID', obj.Model.VariableNames)
+                        obj.View.TableIndexField.Value = 'ID';
+                    end
+                end
+
+                if ismember(obj.View.SplitBillsField.Value, obj.Model.VariableNames)
+                    obj.View.SplitBillsField.Items = sort(obj.Model.VariableNames);
+                else
+                    obj.View.SplitBillsField.Items = sort(obj.Model.VariableNames);
+                    if ismember('RequestID', obj.Model.VariableNames)
+                        obj.View.SplitBillsField.Value = 'RequestID';
+                    end
+                end
+
+                if ismember(obj.View.SortBillsField.Value, obj.Model.VariableNames)
+                    obj.View.SortBillsField.Items = sort(obj.Model.VariableNames);
+                else
+                    obj.View.SortBillsField.Items = sort(obj.Model.VariableNames);
+                    if ismember('CreationDate', obj.Model.VariableNames)
+                        obj.View.SortBillsField.Value = 'CreationDate';
+                    end
+                end
+                
                 obj.View.UITable.ColumnName = obj.Model.VariableNames;
                 obj.View.UITable.Data = obj.Model.T(1,:);
             else
