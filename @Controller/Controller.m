@@ -122,8 +122,8 @@ classdef Controller < handle
                     obj.View.SortBillsField.Items = sort(obj.Model.VariableNames);
                 else
                     obj.View.SortBillsField.Items = sort(obj.Model.VariableNames);
-                    if ismember('CreationDate', obj.Model.VariableNames)
-                        obj.View.SortBillsField.Value = 'CreationDate';
+                    if ismember('BookingStart', obj.Model.VariableNames)
+                        obj.View.SortBillsField.Value = 'BookingStart';
                     end
                 end
                 

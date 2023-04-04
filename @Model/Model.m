@@ -70,7 +70,7 @@ classdef Model < handle
         function start(obj)
             tic
             warning('off', 'MATLAB:xlswrite:AddSheet');
-            wb = waitbar(0, sprintf('Splitting the bills\nPlease wait...'));
+            wb = waitbar(0, sprintf('Splitting the bills\nPlease wait...'), 'Name', 'SplitTheBill processing');
             
             opts = detectImportOptions(obj.Settings.gui.InputFilename, 'NumHeaderLines', 0);
             opts.VariableNamesRange = obj.Settings.gui.HeaderStartingCell;
@@ -85,6 +85,8 @@ classdef Model < handle
             RequesterNameIndex = [];  % index of the field containing the requester's name
             RequesterEMailIndex = [];  % index of the field containing the requester's email
             CreationDateIndex = find(ismember(obj.VariableNames, 'CreationDate'));
+            BookingStartIndex = find(ismember(obj.VariableNames, 'BookingStart'));
+            BookingEndIndex = find(ismember(obj.VariableNames, 'BookingEnd'));
             GroupPIIndex = find(ismember(obj.VariableNames, 'Group'));
             ProjectNameIndex = find(ismember(obj.VariableNames, 'RequestTitle'));
             RequestIDIndex = find(ismember(obj.VariableNames, 'RequestID'));
@@ -203,9 +205,18 @@ classdef Model < handle
                 
                 % do calculations for summary
                 % calculate starting and ending dates
+
+                % the starting date calculated as the earlist day from
+                % booking-start and creation date fields
                 startingDate = min(datetime(table2cell(T2(:, CreationDateIndex)), 'InputFormat','yy-MM-dd HH:mm'));
+                startingDate2 = min(datetime(table2cell(T2(:, BookingStartIndex)), 'InputFormat','yy-MM-dd HH:mm'));
+                startingDate = min([startingDate, startingDate2]);
                 startingDate = datestr(startingDate, 'dd.mm.yyyy');
+                % the ending date calculated as the latest day from
+                % booking-end and creation date fields
                 endingDate = max(datetime(table2cell(T2(:, CreationDateIndex)), 'InputFormat','yy-MM-dd HH:mm'));
+                endingDate2 = max(datetime(table2cell(T2(:, BookingEndIndex)), 'InputFormat','yy-MM-dd HH:mm'));
+                endingDate = max([endingDate, endingDate2]);
                 endingDate = datestr(endingDate, 'dd.mm.yyyy');
                 [~, invoiceName] = fileparts(fnTemplate);
                 
