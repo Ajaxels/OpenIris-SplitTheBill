@@ -82,8 +82,8 @@ classdef Model < handle
             splitIndex = find(ismember(obj.VariableNames, obj.Settings.gui.SplitBillsField));
             sortingIndex = find(ismember(obj.VariableNames, obj.Settings.gui.SortBillsField));
             
-            RequesterNameIndex = [];  % index of the field containing the requester's name
-            RequesterEMailIndex = [];  % index of the field containing the requester's email
+            RequesterNameIndex = find(ismember(obj.VariableNames, 'Requester'));  % index of the field containing the requester's name
+            RequesterEMailIndex = find(ismember(obj.VariableNames, 'RequesterEmail'));  % index of the field containing the requester's email
             CreationDateIndex = find(ismember(obj.VariableNames, 'CreationDate'));
             BookingStartIndex = find(ismember(obj.VariableNames, 'BookingStart'));
             BookingEndIndex = find(ismember(obj.VariableNames, 'BookingEnd'));
@@ -262,8 +262,14 @@ classdef Model < handle
                     end
                 end
                 s{14,6} = PriceTypeVar;
-                
-                shiftY = 17;
+                % add verifier
+                if ~isempty(RequesterNameIndex)
+                    verifierString = sprintf('%s <%s>', T2{1, RequesterNameIndex}{1}, T2{1, RequesterEMailIndex}{1});
+                    s{15, 1} = 'Requester:'; 
+                    s{15, 3} = verifierString; % Verifier
+                end
+
+                shiftY = 18;
                 if sum(productIndices) > 0
                     % products exist
                     lineVec = zeros([numel(resourceList)+2, 1]);  % where to draw a bottom border
@@ -355,14 +361,19 @@ classdef Model < handle
                 %s{shiftY,6} = sprintf('%0.2f', sum(T3.Charge)); %s{shiftY,8} = PriceTypeVar;
                 s{shiftY,6} = sum(T3.Charge); %s{shiftY,8} = PriceTypeVar;
                 
-                
                 % add summary to the summary sheet
                 if obj.Settings.gui.GenerateSummaryFile
                     Summary{SummaryCounter, 1} = s{shiftY, 4}; 
                     Summary{SummaryCounter, 2} = s{shiftY, 3}; 
                     Summary{SummaryCounter, 3} = s{shiftY, 5}; 
                     Summary{SummaryCounter, 4} = s{shiftY, 6}; 
-                    Summary{SummaryCounter, 5} = '';  %  RequesterNameIndex / RequesterEMailIndex
+                    % add requester name
+                    if ~isempty(RequesterNameIndex)
+                        Summary{SummaryCounter, 5} = verifierString;  %  RequesterNameIndex / RequesterEMailIndex
+                    else
+                        Summary{SummaryCounter, 5} = '';  %  RequesterNameIndex / RequesterEMailIndex
+                    end
+                    
                     Summary{SummaryCounter, 6} = cell2mat(table2cell(T2(1, OrganizationIndex))); %s{shiftY,4}; 
                     Summary{SummaryCounter, 7} = PriceTypeVar; 
                     Summary{SummaryCounter, 8} = s{8, 3};
