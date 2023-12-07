@@ -60,7 +60,7 @@ classdef Model < handle
             warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
             waitbar(0.05, wb);
             rangeText = sprintf('%s:%s', obj.Settings.gui.HeaderStartingCell(2:end), obj.Settings.gui.DataStartingCell(2:end));
-            obj.T = readtable(obj.Settings.gui.InputFilename, 'Range', rangeText);   % read excel file
+            obj.T = readtable(obj.Settings.gui.InputFilename, 'Range', rangeText, 'UseExcel', false);   % read excel file
             waitbar(0.9, wb);
             obj.VariableNames = obj.T.Properties.VariableNames;
             waitbar(1, wb);
@@ -75,7 +75,9 @@ classdef Model < handle
             opts = detectImportOptions(obj.Settings.gui.InputFilename, 'NumHeaderLines', 0);
             opts.VariableNamesRange = obj.Settings.gui.HeaderStartingCell;
             opts.DataRange = obj.Settings.gui.DataStartingCell;
-            obj.T = readtable(obj.Settings.gui.InputFilename, opts, 'ReadVariableNames', true);   % read excel file
+            opts = setvartype(opts, 'char');    % force to return elements as cell array
+            
+            obj.T = readtable(obj.Settings.gui.InputFilename, opts, 'ReadVariableNames', true, 'UseExcel', false);   % read excel file
             obj.VariableNames = obj.T.Properties.VariableNames;
             
             tableIndex = find(ismember(obj.VariableNames, obj.Settings.gui.TableIndexField));

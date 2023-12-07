@@ -27,7 +27,7 @@ if ~isdeployed
     addpath(fullfile(func_dir, 'Tools'));
     % addpath(fullfile(func_dir, 'Classes'));
 end
-version = 'ver. 2023.03 (25.04.2023)';
+version = 'ver. 2023.04 (07.12.2023)';
 if isdeployed; version = [version ' Academic version']; end
 model = Model();     % initialize the model
 controller = Controller(model, version);  % initialize controller
